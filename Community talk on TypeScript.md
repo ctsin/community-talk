@@ -1,8 +1,4 @@
-# TypeScript from Zero
-
-https://www.typescriptlang.org/docs/handbook/2/everyday-types.html
-
-## The primitives: `string`, `number`, and `boolean`
+# The primitives: `string`, `number`, and `boolean`
 
 ```ts
 const hello: string = "Hello, world";
@@ -16,21 +12,21 @@ JavaScript has three very commonly used primitives: string, number, and boolean.
 - number is for numbers like 42. JavaScript does not have a special runtime value for integers, so there’s no equivalent to int or float - everything is simply number
 - boolean is for the two values true and false
 
-## Arrays
+# Arrays
 
 ```ts
-const regions: string[] = ["CN", "KR", "IN"];
+const frameworks: string[] = ["React", "Vue", "Solid"];
 const ranges: number[] = [1, 10, 100];
 ```
 
 ```ts
-const regionsGeneric: Array<string> = ["CN", "KR", "IN"];
+const frameworksGeneric: Array<string> = ["React", "Vue", "Solid"];
 const rangesGeneric: Array<number> = [1, 10, 100];
 ```
 
-To specify the type of an array like `regions`, you can use the syntax `string[]`; this syntax works for any type (e.g. `number[]` is an array of numbers, and so on). You may also see this written as `Array<number>`, which means the same thing. We’ll learn more about the syntax `T<U>` when we cover generics.
+To specify the type of an array like `frameworks`, you can use the syntax `string[]`; this syntax works for any type (e.g. `number[]` is an array of numbers, and so on). You may also see this written as `Array<number>`, which means the same thing. We’ll learn more about the syntax `T<U>` when we cover generics.
 
-## Object Types
+# Objects
 
 ```ts
 interface UserProps {
@@ -40,24 +36,28 @@ interface UserProps {
 }
 
 const user: UserProps = { name: "Chris", years: 4, fulltime: true };
+```
 
+Apart from primitives, the most common sort of type you’ll encounter is an object type. This refers to any JavaScript value with properties, which is almost all of them! To define an object type, we simply list its properties and their types.
+
+## Optional Properties
+
+Object types can also specify that some or all of their properties are optional. To do this, add a `?` after the property name:
+
+```ts
 interface UserPropsOptional {
   name?: string;
   years?: number;
   fulltime?: boolean;
 }
 
-type UserPropsOptional = Partial<UserProps>;
-const userOptional: UserPropsOptional = { name: "Chris" };
+type UserPropsOptionalGeneric = Partial<UserProps>;
+const userOptional: UserPropsOptionalGeneric = { name: "Chris" };
 ```
 
-Apart from primitives, the most common sort of type you’ll encounter is an object type. This refers to any JavaScript value with properties, which is almost all of them! To define an object type, we simply list its properties and their types.
+In JavaScript, if you access a property that doesn’t exist, you’ll get the value `undefined` rather than a runtime error. Because of this, when you read from an optional property, you’ll have to check for `undefined` before using it.
 
-### Optional Properties
-
-Object types can also specify that some or all of their properties are optional. To do this, add a ? after the property name?
-
-## Functions
+# Functions
 
 ```ts
 function greet(name: string): string {
@@ -79,7 +79,7 @@ const greet = (name: string) => name;
 
 Much like variable type annotations, you usually don’t need a return type annotation because TypeScript will infer the function’s return type based on its `return` statements. The type annotation in the above example doesn’t change anything.
 
-## Union Types
+# Union Types
 
 TypeScript’s type system allows you to build new types out of existing ones using a large variety of operators. Now that we know how to write a few types, it’s time to start _combining_ them in interesting ways.
 
@@ -88,7 +88,7 @@ The first way to combine types you might see is a _union_ type. A union type is 
 Let’s write a function that can operate on strings or numbers:
 
 ```ts
-function printId(id: number | string) {
+function printId(id: number | string): void {
   console.log("Your ID is: " + id);
 }
 ```
@@ -105,7 +105,7 @@ printId("202");
 printId({ myID: 22342 });
 ```
 
-## Type Aliases
+# Type Aliases
 
 ```ts
 type ID = number | string;
@@ -117,27 +117,7 @@ function printId(id: ID) {
 
 We’ve been using object types and union types by writing them directly in type annotations. This is convenient, but it’s common to want to use the same type more than once and refer to it by a single name.
 
-## Type Assertions
-
-Sometimes you will have information about the type of a value that TypeScript can’t know about.
-
-For example, if you’re using document.getElementById, TypeScript only knows that this will return some kind of HTMLElement, but you might know that your page will always have an HTMLCanvasElement with a given ID.
-
-In this situation, you can use a type assertion to specify a more specific type:
-
-```ts
-const myCanvas = document.getElementById("main_canvas") as HTMLCanvasElement;
-```
-
-Like a type annotation, type assertions are removed by the compiler and won’t affect the runtime behavior of your code.
-
-You can also use the angle-bracket syntax (except if the code is in `a .tsx` file), which is equivalent:
-
-```ts
-const myCanvas = <HTMLCanvasElement>document.getElementById("main_canvas");
-```
-
-## Literal Types
+# Literal Types
 
 In addition to the general types `string` and `number`, we can refer to _specific_ strings and numbers in type positions.
 
@@ -168,7 +148,38 @@ Numeric literal types work the same way:
 declare function printLevel(level: 0 | 1 | 2): void;
 ```
 
-## Literal Inference
+# Template Literal Types
+
+Template literal types build on string literal types, and have the ability to expand into many strings via unions.
+
+They have the same syntax as template literal strings in JavaScript, but are used in type positions. When used with concrete literal types, a template literal produces a new string literal type by concatenating the contents.
+
+```ts
+type World = "world";
+
+type Greeting = `hello ${World}`;
+```
+
+When a union is used in the interpolated position, the type is the set of every possible string literal that could be represented by each union member:
+
+```ts
+type VerticalAlignment = "top" | "middle" | "bottom";
+type HorizontalAlignment = "left" | "center" | "right";
+
+// Takes
+//   | "top-left"    | "top-center"    | "top-right"
+//   | "middle-left" | "middle-center" | "middle-right"
+//   | "bottom-left" | "bottom-center" | "bottom-right"
+
+declare function setAlignment(
+  value: `${VerticalAlignment}-${HorizontalAlignment}`
+): void;
+
+setAlignment("top-left"); // works!
+setAlignment("top-middel"); // error!
+```
+
+# Literal Inference
 
 When you initialize a variable with an object, TypeScript assumes that the properties of that object might change values later. For example, if you wrote code like this:
 
@@ -205,51 +216,7 @@ handleRequest(req.url, req.method);
 
 The `as const` suffix acts like `const` but for the type system, ensuring that all properties are assigned the literal type instead of a more general version like `string` or `number`.
 
-## Non-null Assertion Operator (Postfix `!`)
-
-TypeScript also has a special syntax for removing `null` and `undefined` from a type without doing any explicit checking. Writing `!` after any expression is effectively a type assertion that the value isn’t `null` or `undefined`:
-
-```ts
-function liveDangerously(x?: number | null) {
-  // No error
-  console.log(x!.toFixed());
-}
-```
-
-PLACEHOLDER: 一个实用技巧
-
-```ts
-const PRODUCTS = [
-  { name: "Foo", id: "foo" },
-  { name: "Bar", id: "bar" },
-];
-
-// <ProductList />
-const ProductList = () => {
-  const onClick = (id: string) => "Access to specific product page";
-
-  return PRODUCTS.map(({ name, id }) => (
-    <div onClick={() => onClick(id)}>{name}</div>
-  ));
-};
-
-// <ProductDetails />
-const ProductDetails = ({ id }) => {
-  const product = PRODUCTS.find((product) => product.id === id);
-
-  return <div>{product.name}</div>;
-};
-```
-
-```ts
-const element = document.getElementById("root");
-
-element.innerHTML = "! non-null assertion";
-```
-
-Just like other type assertions, this doesn’t change the runtime behavior of your code, so it’s important to only use `!` when you know that the value _can’t_ be `null` or `undefined`.
-
-## Generics
+# Generics
 
 A major part of software engineering is building components that not only have well-defined and consistent APIs, but are also reusable. Components that are capable of working on the data of today as well as the data of tomorrow will give you the most flexible capabilities for building up large software systems.
 
@@ -262,7 +229,7 @@ interface User {
   gender: "F" | "M";
 }
 
-async function getUser() {
+async function getUser<T>() {
   const response = await fetch("");
   const user: User = await response.json();
 
@@ -285,37 +252,78 @@ const userCN = await getUser<UserCN>();
 const userKR = await getUser<UserKR>();
 ```
 
-# Wrap up
+# Type Assertions
 
-Plan A
+Sometimes you will have information about the type of a value that TypeScript can’t know about.
+
+For example, if you’re using document.getElementById, TypeScript only knows that this will return some kind of HTMLElement, but you might know that your page will always have an HTMLCanvasElement with a given ID.
+
+In this situation, you can use a type assertion to specify a more specific type:
 
 ```ts
-type Device = "laptop" | "pad" | "mobile";
-
-type IsDevice = {
-  [K in `is${Capitalize<Device>}`]: ReturnType<typeof isDevice>;
-};
-
-declare function isDevice(device: Device): boolean;
-
-const useDevice = (): IsDevice => {
-  const isLaptop = isDevice("laptop");
-  const isPad = isDevice("pad");
-  const isMobile = isDevice("mobile");
-
-  return { isLaptop, isPad, isMobile };
-};
-
-const { isLaptop } = useDevice();
+const myCanvas = document.getElementById("main_canvas") as HTMLCanvasElement;
 ```
 
-Plan B
+Like a type annotation, type assertions are removed by the compiler and won’t affect the runtime behavior of your code.
+
+You can also use the angle-bracket syntax (except if the code is in `a .tsx` file), which is equivalent:
 
 ```ts
-const Device = { laptop: "1TB", pad: "512G", mobile: "128G" } as const;
-type DeviceType = typeof Device;
+const myCanvas = <HTMLCanvasElement>document.getElementById("main_canvas");
+```
+
+# Non-null Assertion Operator (Postfix `!`)
+
+TypeScript also has a special syntax for removing `null` and `undefined` from a type without doing any explicit checking. Writing `!` after any expression is effectively a type assertion that the value isn’t `null` or `undefined`:
+
+```ts
+function liveDangerously(x?: number | null) {
+  // No error
+  console.log(x!.toFixed());
+}
+```
+
+A usage in real life:
+
+```ts
+const PRODUCTS = [
+  { name: "Foo", id: "foo" },
+  { name: "Bar", id: "bar" },
+];
+
+// <ProductList />
+const ProductList = () => {
+  const onClick = (id: string) => `Access to product page with ${id}`;
+
+  return PRODUCTS.map(({ name, id }) => (
+    <div onClick={() => onClick(id)}>{name}</div>
+  ));
+};
+
+// <ProductDetails />
+const ProductDetails = ({ id }) => {
+  const product = PRODUCTS.find((product) => product.id === id);
+
+  return <div>{product.name}</div>;
+};
+```
+
+```ts
+const element = document.getElementById("root");
+
+element.innerHTML = "! non-null assertion";
+```
+
+Just like other type assertions, this doesn’t change the runtime behavior of your code, so it’s important to only use `!` when you know that the value _can’t_ be `null` or `undefined`.
+
+# Wrap up
+
+```ts
+const DEVICE = { laptop: "1TB", pad: "512G", mobile: "128G" } as const;
+type DeviceType = typeof DEVICE;
 type DeviceKeys = keyof DeviceType;
 type DeviceValues = DeviceType[DeviceKeys];
+type Storage = typeof DEVICE[keyof typeof DEVICE];
 
 type IsDevice = {
   [K in `is${Capitalize<DeviceKeys>}`]: ReturnType<typeof isDevice>;
@@ -331,9 +339,8 @@ const useDevice = (): IsDevice => {
   return { isLaptop, isPad, isMobile };
 };
 
-declare function useDeviceCapacity(): DeviceValues;
-
 const { isLaptop } = useDevice();
 
-const capacity = useDeviceCapacity();
+declare function useDeviceStorage(): Storage;
+const storage = useDeviceStorage();
 ```
