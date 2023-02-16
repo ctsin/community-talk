@@ -55,14 +55,7 @@
       "key": "6"
     }
   ],
-  "editor:set-heading": [
-    {
-      "modifiers": [
-        "Mod"
-      ],
-      "key": "0"
-    }
-  ],
+  "editor:set-heading": [],
   "workspace:goto-last-tab": [],
   "editor:swap-line-down": [
     {
@@ -114,6 +107,56 @@
         "Mod"
       ],
       "key": "`"
+    }
+  ],
+  "window:reset-zoom": [
+    {
+      "modifiers": [
+        "Mod"
+      ],
+      "key": "0"
+    }
+  ],
+  "window:zoom-in": [
+    {
+      "modifiers": [
+        "Mod"
+      ],
+      "key": "+"
+    }
+  ],
+  "window:zoom-out": [
+    {
+      "modifiers": [
+        "Mod"
+      ],
+      "key": "-"
+    }
+  ],
+  "global-search:open": [
+    {
+      "modifiers": [
+        "Mod",
+        "Shift"
+      ],
+      "key": "F"
+    },
+    {
+      "modifiers": [],
+      "key": "F3"
+    }
+  ],
+  "app:open-help": [],
+  "markdown:toggle-preview": [
+    {
+      "modifiers": [
+        "Mod"
+      ],
+      "key": "E"
+    },
+    {
+      "modifiers": [],
+      "key": "F1"
     }
   ]
 }
