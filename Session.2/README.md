@@ -11,7 +11,9 @@ const n1: Name = {
 
 // string | number 🤔
 n1.foo;
+```
 
+```ts
 const n2 = {
   foo: 19,
 } satisfies Name;
@@ -59,7 +61,9 @@ interface UserRoleConfig {
   user: ["read", "update"];
   superuser: ["read", "create", "update", "remove"];
 }
+```
 
+```ts
 // type Actions = "read" | "update" | "create" | "remove"
 type Actions = UserRoleConfig[keyof UserRoleConfig][number];
 ```
@@ -76,7 +80,7 @@ const duration = [
     label: "Bar",
     value: 3,
   },
-] as const;
+];
 
 // 1 | 3
 type DurationValue = typeof duration[number]["value"];

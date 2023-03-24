@@ -134,7 +134,8 @@
       }
     ],
     "direction": "horizontal",
-    "width": 300
+    "width": 300,
+    "collapsed": true
   },
   "left-ribbon": {
     "hiddenItems": {
@@ -149,8 +150,13 @@
   "active": "183fdaee5d5c2e00",
   "lastOpenFiles": [
     "Session.1/README.md",
-    "README.md",
     "Session.2/README.md",
+    "Session.2/Unions-Intersection.ts",
+    "Session.2/Unions-Intersection.md",
+    "Session.2/index.tsx",
+    "Session.2/play.tsx",
+    "Untitled",
+    "README.md",
     "Session.2.md",
     "Session.2/index.ts",
     "Session.1/Union-Alias.ts",
@@ -158,10 +164,6 @@
     "Session.1/Template-Literal.ts",
     "Session.1/Primitives.ts",
     "Session.1/Objects.ts",
-    "Session.1/non-null.tsx",
-    "Session.1/Literal-Types.ts",
-    "Session.1/Literal-Inference.ts",
-    "Session.1/In-Actioins.ts",
     "Session.1.md",
     "Session-1.md",
     "Session-2.md",
