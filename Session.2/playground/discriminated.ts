@@ -10,9 +10,7 @@ interface Confirm {
 type Props = Alert | Confirm;
 
 function Modal(props: Props) {
-  if (props.type === "confirm") {
-    const message = props.confirmButtonMassage.toUpperCase();
-  }
+  const message = props.confirmButtonMassage.toUpperCase();
 
   return null;
 }

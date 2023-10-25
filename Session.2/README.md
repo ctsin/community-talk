@@ -1,3 +1,5 @@
+This is the second part of the community talk! Before we embark on this exciting journey, let us take a moment to briefly review the content covered in part one. In the first part, we mainly discussed some TypeScript basics. In the second part, we will cover some practical scenarios, resolve errors, and complete a comprehensive demo.
+
 # satisfies
 
 https://www.prisma.io/blog/satisfies-operator-ur8ys8ccq7zb
@@ -6,7 +8,7 @@ https://devblogs.microsoft.com/typescript/announcing-typescript-4-9/#the-satisfi
 
 One of TypeScript's strengths is how it can infer the type of an expression from context. For example, you can declare a variable without a type annotation, and its type will be inferred from the value you assign to it. This is especially useful when the exact type of a value is complex, and explicitly annotating the type would require a lot of duplicate code.
 
-Consider some code that defines subscription pricing tiers and turns them into strings using the toFixed method on Number:
+Consider some code that defines subscription pricing tiers /tɪə/ and turns them into strings using the `toFixed` method on Number:
 
 ```js
 type Plan = "personal" | "team" | "enterprise";
@@ -14,12 +16,26 @@ type Pricing = number | ((users: number) => number);
 
 const plans = {
   personal: 10,
-  team: (users) => users * 5,
-  enterprie: (users) => users * 20,
+  team: (users: number) => users * 5,
+  enterprie: (users: number) => users * 20,
+  //     ^^ Oh no! We have a typo in "enterprise"
 };
+
+const pricingA = plans.personal.toFixed(2);
+
+const pricingB = plans.team(10).toFixed(2);
+
+// ERROR: Property 'enterprise' does not exist on type...
+const pricingC = plans.enterprise(50).toFixed(2);
 ```
 
-If we use an explicit type annotation on plans, we can catch the typo earlier, as well as infer the type of the users arguments. However, we might run into a different problem.
+We can use `Number` methods on `plans.personal`, call `plans.team` as a function. But we will fail to access `enterprise` property as the typo in variable.
+
+```js
+Record<Plan, Pricing>
+```
+
+If we use an explicit type annotation on `plans`, we can catch the typo earlier, as well as infer the type of the users arguments. However, we might run into a different problem.
 
 ```js
 type Plan = "personal" | "team" | "enterprise";
@@ -28,13 +44,11 @@ type Pricing = number | ((users: number) => number);
 const plans: Record<Plan, Pricing> = {
   personal: 10,
   team: (users) => users * 5,
+
+  // We now catch this error immediately at the source:
+  // ERROR: 'enterprie' does not exist in type...
   enterprie: (users) => users * 20,
 };
-```
-
-```js
-const pricingA = plans.personal.toFixed(2);
-const pricingB = plans.team(10).toFixed(2);
 ```
 
 When we use an explicit type annotation, the type gets "widened", and TypeScript can no longer tell which of our plans have flat pricing and which have per-user pricing. Effectively, we have "lost" some information about our types.
@@ -42,11 +56,6 @@ When we use an explicit type annotation, the type gets "widened", and TypeScript
 What we really need is a way to assert that a value is compatible with some reusable type, while letting TypeScript infer a more specific type.
 
 The new `satisfies` operator gives the benefits, with no runtime impact, and automatically checks for excess /ɪkˈses, ˈekses/ or misspelled properties.
-
-```js
-type Plan = "personal" | "team" | "enterprise";
-type Pricing = number | ((users: number) => number);
-```
 
 ```js
 const plans = {
@@ -89,6 +98,18 @@ const postCreate = {
 } satisfies Prisma.PostCreateInput;
 ```
 
+```
+"Title Baz"
+```
+
+```
+"It is a long established fact."
+```
+
+```
+"653612b54a44aeb6a7ea066b"
+```
+
 ```js
 const postCreate = {
   title: "Title Baz",
@@ -102,7 +123,7 @@ const postCreate = {
 ```
 
 ```sh
-npx ts-node --esm satisfies.ts
+npx ts-node --esm ./Session.2/playground/satisfies.ts
 ```
 
 ```js
@@ -170,6 +191,8 @@ const groupByArgs = {
 
 # excess property checks
 
+This problem has troubled me for a long time. So, I want to discuss it with you here.
+
 > Object literal may only specify known properties
 
 https://www.typescriptlang.org/docs/handbook/2/objects.html#excess-property-checks
@@ -183,12 +206,12 @@ interface Person {
   name: string;
 }
 
-const personFoo: Person = { name: "Sarah", age: 13 };
+const person: Person = { name: "Sarah", age: 13 };
 ```
 
 The error indicate that 'age' does not exist in type 'Person'
 
-You could argue that this program is correctly typed, since the `name` properties are compatible, and the extra `age` property is insignificant.
+You could argue that this program is correctly typed, since the `name` property is compatible, and the extra `age` property is insignificant.
 
 However, TypeScript takes the stance that there’s probably a bug in this code. Object literals get special treatment and undergo excess property checking when assigning them to other variables, or passing them as arguments. If an object literal has any properties that the “target type” doesn’t have, you’ll get an error.
 
@@ -224,7 +247,7 @@ interface Props {
 }
 ```
 
-Notice we’re using a union of string literal types: `alert` and `confirm` to tell us whether we should treat the modal as a alert modal or confirm modal respectively. By using `alert` | `confirm` instead of string, we can avoid misspelling issues.
+Notice we’re using a union of string literal types: `alert` and `confirm` to tell us whether we should treat the modal as a alert modal or confirm modal respectively.
 
 ```js
 function Modal(props: Props) {
@@ -265,7 +288,9 @@ Discriminated unions are useful for more than just talking about message type. T
 
 At the end of this talk, we will have a complex example to cover it again.
 
-# Use TypeScript's `never` to enforce "one or the other" properties on a type
+# never
+
+TypeScript 2.0 introduces a new primitive type `never`. The `never` type represents the type of values that never occur /əˈkər/. Here we use `never` to enforce "one or the other" properties on a type
 
 We have a type `Course` defined with three properties: `name`, `url`, and `price`.
 
@@ -277,9 +302,7 @@ type Course = {
   url?: string;
   price?: number;
 };
-```
 
-```js
 export const course: Course = {
   name: "Hello World",
   price: 5,
@@ -315,7 +338,7 @@ export const course: Course = {
 };
 ```
 
-In short, Use `never` in positions where there will not or should not be a value
+In short, use `never` in positions where there will not or should not be a value
 
 # Generic Components
 
@@ -326,15 +349,13 @@ In short, Use `never` in positions where there will not or should not be a value
 ```js
 import React from "react";
 
-type TableProps<T> = {
+interface TableProps<T> {
   data: T[],
   onRowClick(row: T): void,
 };
 
 declare function Table<T>(props: TableProps<T>): null;
-```
 
-```js
 export default () => (
   <Table
     data={[{ name: "Foo" }]}
@@ -363,11 +384,11 @@ function Table<T>({ data, onRowClick }: TableProps<T>) {
 
 TypeScript raised an error indicating that "Property 'name' does not exist on type 'T'."
 
-This is because we passed in the generic parameter T, but TypeScript cannot determine that T will contain the `name` property.
+This is because we passed in the generic parameter `T`, but TypeScript cannot determine that T will contain the `name` property.
 
-The `extends` statement is used in the context of function generic types to specify constraints on the type parameter.
+The `extends` statement is used in this context of function generic types to specify constraints on the type parameter.
 
-When a function has a generic type defined using <T extends TypeFooBar>, it means that the type T can be any subtype (or same type) of TypeFooBar. This constraint ensures that only certain types are assignable to the generic parameter when invoking or implementing the function.
+When a function has a generic type defined using `<T extends TypeFooBar>`, it means that the type `T` can be any subtype (or same type) of target type. This constraint ensures that only certain types are assignable to the generic parameter when invoking or implementing the function.
 
 ```js
 function Table<T extends {name: string}>({ data, onRowClick }: TableProps<T>) {
@@ -435,7 +456,7 @@ declare function foo(...args: [arg1: string, arg2: number]): void;
 
 Overall, labeled tuples are handy when taking advantage of patterns around tuples and argument lists
 
-# Dynamic function arguments with Generic
+# Hands on
 
 Great, let's summarize the knowledge we discussed earlier and use them to complete the following example.
 
@@ -467,8 +488,8 @@ sendEvent("SIGN_IN");
 ```
 
 ```js
-type EvtType = Evt["type"];
 // type EvtType = "SIGN_IN" | "SIGN_OUT"
+type EvtType = Evt["type"];
 ```
 
 ```js
@@ -498,6 +519,7 @@ type Evt =
 
 // type EvtType = "SIGN_IN" | "SIGN_OUT"
 type EvtType = Evt["type"]
+
 // type SignInArgs = {
 //   type: "SIGN_IN";
 //   payload: {
@@ -505,15 +527,15 @@ type EvtType = Evt["type"]
 //   };
 // }
 type SignInArgs = Extract<Evt, { type: "SIGN_IN" }>
+
 // type SignOutArgs = { type: "SIGN_OUT" }
 type SignOutArgs = Extract<Evt, { type: "SIGN_OUT" }>
 
-declare function sendEvent<T extends EvtType>(...args: Extract<Evt, { type: T }> extends { payload: infer Payload } ? [type: T, payload: Payload] : [type: T]): void
-// declare function sendEvent<T extends Evt["type"]>(
-//   ...args: Extract<Evt, { type: T }> extends { payload: infer Payload }
-//     ? [type: T, payload: Payload]
-//     : [type: T]
-// ): void;
+declare function sendEvent<T extends EvtType>(
+  ...args: Extract<Evt, { type: T }> extends { payload: infer Payload }
+    ? [type: T, payload: Payload]
+    : [type: T]
+): void;
 
 // Correct
 sendEvent("SIGN_OUT");
@@ -524,4 +546,10 @@ sendEvent("SIGN_OUT", {});
 sendEvent("SIGN_IN", { userID: 123 });
 sendEvent("SIGN_IN", {});
 sendEvent("SIGN_IN");
+```
+
+Please recall what we just discussed about labeled tuple
+
+```js
+declare function foo(...args: [arg1: string, arg2: number]): void;
 ```
