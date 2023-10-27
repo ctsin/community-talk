@@ -1,3 +1,11 @@
+- [satisfies](#satisfies)
+- [excess property checks](#excess-property-checks)
+- [Discriminated union](#discriminated-union)
+- [never](#never)
+- [Generic Components](#generic-components)
+- [Labeled Tuple Elements](#labeled-tuple-elements)
+- [Hands on](#hands-on)
+
 This is the second part of the community talk! Before we embark on this exciting journey, let us take a moment to briefly review the content covered in part one. In the first part, we mainly discussed some TypeScript basics. In the second part, we will cover some practical scenarios, resolve errors, and complete a comprehensive demo.
 
 # satisfies
